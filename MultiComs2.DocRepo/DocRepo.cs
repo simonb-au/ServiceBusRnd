@@ -27,19 +27,7 @@ namespace MultiComs2.DocRepo
 
         protected override void Init(string[] args)
         {
-            var nsMgr = NamespaceManager.Create();
-
-            var subsExists = nsMgr.SubscriptionExists(Constants.ComsGendEvent, Constants.ComsStoreSubs);
-
-            if (subsExists && Reset)
-            {
-                nsMgr.DeleteSubscription(Constants.ComsGendEvent, Constants.ComsStoreSubs);
-                subsExists = false;
-            }
-
-            if (!subsExists)
-                nsMgr.CreateSubscription(Constants.ComsGendEvent, Constants.ComsStoreSubs);
-
+            VerifySubs(Constants.ComsGendEvent, Constants.ComsStoreSubs, Reset);
             _sc = SubscriptionClient.Create(Constants.ComsGendEvent, Constants.ComsStoreSubs);
         }
 

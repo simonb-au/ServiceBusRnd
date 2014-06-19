@@ -30,7 +30,7 @@ namespace MultiComs2.ComsGen
         {
             VerifyTopic(Constants.ComsGendEvent, Reset);
 
-            _cmdQueueClient = QueueClient.Create(Constants.GenComsCmd);
+            _cmdQueueClient = QueueClient.Create(Constants.ComsGenCmd);
             _eventTopicClient = TopicClient.Create(Constants.ComsGendEvent);
         }
 

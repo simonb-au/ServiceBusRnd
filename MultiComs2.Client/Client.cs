@@ -32,7 +32,7 @@ namespace MultiComs2.Client
         protected override void Init(string[] args)
         {
             Console.WriteLine("Starting.");
-            VerifyTopic(Constants.BusTopicName, Reset);
+            VerifyTopic(Constants.BusEvent, Reset);
 
             if (args.Contains("pause", StringComparer.OrdinalIgnoreCase))
             {
@@ -40,7 +40,7 @@ namespace MultiComs2.Client
                 Console.ReadLine();
             }
 
-            _topicClient = TopicClient.Create(Constants.BusTopicName);
+            _topicClient = TopicClient.Create(Constants.BusEvent);
 
             _eventCounter = 0;
         }
@@ -57,6 +57,8 @@ namespace MultiComs2.Client
 
             var msg = new BusEvent
             {
+                ReqSeq = _eventCounter,
+                ReqProcCount = 0,
                 RequestId = Guid.NewGuid(),
                 Timestamp = DateTime.UtcNow,
                 BusEventType = (BusEventType)_rnd.Next(_eventTypeCount),

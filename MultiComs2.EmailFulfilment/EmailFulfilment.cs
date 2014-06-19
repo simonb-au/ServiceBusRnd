@@ -26,21 +26,8 @@ namespace MultiComs2.EmailFulfilment
 
         protected override void Init(string[] args)
         {
-            var nsMgr = NamespaceManager.Create();
-
-            var exists = nsMgr.SubscriptionExists(Constants.ComsGendEvent, Constants.ComsEmailFulfilmentSubs);
-
-            if (Reset && exists)
-            {
-                nsMgr.DeleteSubscription(Constants.ComsGendEvent, Constants.ComsEmailFulfilmentSubs);
-                exists = false;
-            }
-
-            if (!exists)
-                nsMgr.CreateSubscription(Constants.ComsGendEvent, Constants.ComsEmailFulfilmentSubs, new SqlFilter("ComsType='Email'"));
-
+            VerifySubs(Constants.ComsGendEvent, Constants.ComsEmailFulfilmentSubs, Reset, new SqlFilter("ComsType='Email'"));
             _sc = SubscriptionClient.Create(Constants.ComsGendEvent, Constants.ComsEmailFulfilmentSubs);
-
         }
 
         protected override void ThreadLoop()

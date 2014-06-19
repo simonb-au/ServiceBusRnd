@@ -49,11 +49,11 @@ namespace MultiComs2.MsgRules
             _custPrefs = LoadCustPrefs();
             Thread.Sleep(1000); // Startup Time...
 
-            VerifySubs(Constants.BusTopicName, Constants.BusSubs, Reset);
-            VerifyQueue(Constants.GenComsCmd, Reset);
+            VerifySubs(Constants.BusEvent, Constants.BusSubs, Reset);
+            VerifyQueue(Constants.ComsGenCmd, Reset);
 
-            _subsClient = SubscriptionClient.Create(Constants.BusTopicName, Constants.BusSubs);
-            _comsCmdQueue = QueueClient.Create(Constants.GenComsCmd);
+            _subsClient = SubscriptionClient.Create(Constants.BusEvent, Constants.BusSubs);
+            _comsCmdQueue = QueueClient.Create(Constants.ComsGenCmd);
         }
 
         protected override void CleanUp()
@@ -74,9 +74,11 @@ namespace MultiComs2.MsgRules
 
             brokerMsg.Complete();
 
-            Console.WriteLine("Received: {0} {1} (took {2})",
+            Console.WriteLine("Received: {0} {1} ({2}, Proc {3}, took {4})",
                 msg.BusEventType,
                 msg.Timestamp.ToLocalTime().ToLongTimeString(),
+                msg.ReqSeq,
+                msg.ReqProcCount,
                 (int)((now - msg.Timestamp).TotalMilliseconds));
 
             var genComsCmd = new GenComsCmd
@@ -85,6 +87,10 @@ namespace MultiComs2.MsgRules
                 CustomerId= msg.CustomerId,
                 RequestId = msg.RequestId,
                 Timestamp = msg.Timestamp,
+
+                ReqSeq = msg.ReqSeq,
+                ReqProcCount = msg.ReqProcCount + 1
+
             };
 
             if (!_custPrefs.TryGetValue(msg.CustomerId, out genComsCmd.ComsType))

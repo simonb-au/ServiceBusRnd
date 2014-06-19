@@ -25,22 +25,8 @@ namespace MultiComs2.Crm
 
         protected override void Init(string[] args)
         {
-
-            var nsMgr = NamespaceManager.Create();
-
-            var subsExists = nsMgr.SubscriptionExists(Constants.ComsGendEvent, Constants.ComsAuditSubs);
-
-            if (subsExists && Reset)
-            {
-                nsMgr.DeleteSubscription(Constants.ComsGendEvent, Constants.ComsAuditSubs);
-                subsExists = false;
-            }
-
-            if (!subsExists)
-                nsMgr.CreateSubscription(Constants.ComsGendEvent, Constants.ComsAuditSubs);
-
+            VerifySubs(Constants.ComsGendEvent, Constants.ComsAuditSubs, Reset);
             _sc = SubscriptionClient.Create(Constants.ComsGendEvent, Constants.ComsAuditSubs);
-
         }
 
         protected override void ThreadLoop()

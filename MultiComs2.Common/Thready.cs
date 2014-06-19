@@ -4,6 +4,7 @@ using System.Threading;
 using System.IO;
 
 using Microsoft.ServiceBus;
+using Microsoft.ServiceBus.Messaging;
 
 
 namespace MultiComs2.Common
@@ -95,6 +96,8 @@ namespace MultiComs2.Common
 
         protected void VerifyQueue(string queueName, bool reset)
         {
+            Console.WriteLine("VerifyQueue Topic - {0} (Reset = {1})", queueName, reset);
+
             var nsMgr = NamespaceManager.Create();
 
             var queueExists = nsMgr.QueueExists(queueName);
@@ -111,6 +114,8 @@ namespace MultiComs2.Common
 
         protected void VerifyTopic(string topicName, bool reset)
         {
+            Console.WriteLine("Verifying Topic - {0} (Reset = {1})", topicName, reset);
+
             var nsMgr = NamespaceManager.Create();
 
             var exists = nsMgr.TopicExists(topicName);
@@ -129,6 +134,13 @@ namespace MultiComs2.Common
 
         protected void VerifySubs(string topicPath, string subsName, bool reset)
         {
+            VerifySubs(topicPath, subsName, reset, null);
+        }
+
+        protected void VerifySubs(string topicPath, string subsName, bool reset, Filter filter)
+        {
+            Console.WriteLine("VerifySubs Topic - {0}, {1} (Reset = {2})", topicPath, subsName, reset);
+            
             var nsMgr = NamespaceManager.Create();
 
             var subsExists = nsMgr.SubscriptionExists(topicPath, subsName);
@@ -140,8 +152,12 @@ namespace MultiComs2.Common
             }
 
             if (!subsExists)
-                nsMgr.CreateSubscription(topicPath, subsName);
+            {
+                if (filter != null)
+                    nsMgr.CreateSubscription(topicPath, subsName, filter);
+                else
+                    nsMgr.CreateSubscription(topicPath, subsName);
+            }
         }
-
     }
 }
