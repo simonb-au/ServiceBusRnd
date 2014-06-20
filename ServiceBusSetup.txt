@@ -1,21 +1,15 @@
-
-TestKey
-
-Processing completed
-SubscriptionId: 00000000000000000000000000000000
-State: Active
 Name: ServiceBusDefaultNamespace
 AddressingScheme: Path
-CreatedTime: 18/06/2014 7:50:39 AM
+CreatedTime: 20/06/2014 6:39:50 AM
 IssuerName: ServiceBusDefaultNamespace
 IssuerUri: ServiceBusDefaultNamespace
 ManageUsers: simonb
 DnsEntry: 
-PrimarySymmetricKey: XJ36OdR2V/k8RiilEX3yHpbFT+tBaYSqQuvYmnxdRtM=
+PrimarySymmetricKey: HPyQ3gYeReE6u7PzxGtON8jNhJG8Nfq6VtCG/0IdVsY=
 SecondarySymmetricKey: 
 
 
 Processing completed
-Endpoint=sb://maxdev01/ServiceBusDefaultNamespace;StsEndpoint=https://maxdev01:9355/ServiceBusDefaultNamespace;RuntimePort=9354;ManagementPort=9355
+Endpoint=sb://simonb-dev/ServiceBusDefaultNamespace;StsEndpoint=https://simonb-dev:9355/ServiceBusDefaultNamespace;RuntimePort=9354;ManagementPort=9355
 
 Processing completed
