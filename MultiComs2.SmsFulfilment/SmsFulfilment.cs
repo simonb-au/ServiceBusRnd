@@ -55,10 +55,12 @@ namespace MultiComs2.SmsFulfilment
                     var now = DateTime.UtcNow;
                     msg.Complete();
 
-                    Console.WriteLine("Sending SMS To Customer {0} (took {1}ms) {2}",
+                    Console.WriteLine("Sending SMS To Customer {0} (took {1}ms) {2} ({3:HH:mm:ss.fff} - {4:hh:mm:ss.fff}",
                         comsGenEvent.CustomerId,
                         (int)((now - comsGenEvent.Timestamp).TotalMilliseconds),
-                        comsGenEvent.ComsType);
+                        comsGenEvent.ComsType,
+                        now,
+                        comsGenEvent.Timestamp);
                 }
                 catch(System.Runtime.Serialization.SerializationException ex)
                 {
