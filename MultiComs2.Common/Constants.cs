@@ -21,6 +21,5 @@ namespace MultiComs2.Common
         public const string ComsEmailFulfilmentSubs = "ComsEmailFulfilmentSubs";
 
         public const string ComsFulfilledEvent = "ComsFulfilledEvent";
-        public const string ComsFulfilledUpdateSubs = "ComsFulfilledUpdate";
     }
 }

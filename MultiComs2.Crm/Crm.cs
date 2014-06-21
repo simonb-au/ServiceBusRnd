@@ -1,48 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
-
-using MultiComs2.Common;
-using Microsoft.ServiceBus.Messaging;
-using Microsoft.ServiceBus;
+using System.Linq;
+using log4net;
 
 namespace MultiComs2.Crm
 {
-    class Program : Thready
+    public class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            var program = new Program();
-            program.Run(args);
-        }
+            var log = LogManager.GetLogger(typeof (Program));
+            log.Info("Starting CRM...");
 
-        public Program()
-            : base("MultiComs2.Crm")
-        {
-        }
+            var crmDb = new Dictionary<Guid, ContactRecord>();
 
-        private SubscriptionClient _sc;
-        private readonly TimeSpan _waitTime = new TimeSpan(TimeSpan.TicksPerSecond);
+            var crmReqListener = new CrmRequestListener(crmDb);
+            crmReqListener.StartUp(args);
+            crmReqListener.RunThread();
 
-        protected override void Init(string[] args)
-        {
-            VerifySubs(Constants.ComsGendEvent, Constants.ComsAuditSubs, Reset);
-            _sc = SubscriptionClient.Create(Constants.ComsGendEvent, Constants.ComsAuditSubs);
-        }
+            var crmFulfilmentListener = new CrmFulfilmentListener(crmDb);
+            crmFulfilmentListener.StartUp(args);
+            crmFulfilmentListener.RunThread();
 
-        protected override void ThreadLoop()
-        {
-            var msg = _sc.Receive(_waitTime);
-            if (msg != null)
+            Console.ReadLine();
+
+            crmFulfilmentListener.JoinThread();
+            crmReqListener.JoinThread();
+
+
+            foreach (var cr in crmDb.Values.OrderBy(x => x.CustomerId))
             {
-                var comsGenEvent = msg.GetBody<ComsGeneratedEvent>();
-                var now = DateTime.UtcNow;
-                msg.Complete();
-    
-                Console.WriteLine("Storing Coms Contact Event for Customer {0} - {1} (took {2}ms)", 
-                    comsGenEvent.CustomerId, 
-                    comsGenEvent.ComsType,
-                    (int)((now - comsGenEvent.Timestamp).TotalMilliseconds));
+                Console.WriteLine("{0} - {1}, {2}", cr.CustomerId, cr.ContactId, cr.ContactStatus);
             }
+
+            Console.ReadLine();
         }
     }
 }

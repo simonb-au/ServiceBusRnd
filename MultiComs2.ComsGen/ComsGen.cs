@@ -54,7 +54,7 @@ namespace MultiComs2.ComsGen
 
             Console.WriteLine("Received: {0} (took {1})",
                 msg.ComsType,
-                (int)((now - msg.Timestamp).TotalMilliseconds));
+                (int)((now - msg.OrigReqTimestampUtc).TotalMilliseconds));
 
             var body = GenerateComs(msg.ComsType, msg.CustomerId);
 
@@ -63,7 +63,7 @@ namespace MultiComs2.ComsGen
                 CustomerId = msg.CustomerId,
                 ComsType = msg.ComsType,
                 RequestId = msg.RequestId,
-                Timestamp = msg.Timestamp,
+                OrigReqTimestampUtc = msg.OrigReqTimestampUtc,
                 Body = body,
                 DocId = Guid.NewGuid()
             };

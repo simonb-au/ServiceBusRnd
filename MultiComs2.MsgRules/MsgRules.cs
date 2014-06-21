@@ -76,17 +76,17 @@ namespace MultiComs2.MsgRules
 
             Console.WriteLine("Received: {0} {1} ({2}, Proc {3}, took {4})",
                 msg.BusEventType,
-                msg.Timestamp.ToLocalTime().ToLongTimeString(),
+                msg.OrigReqTimestampUtc.ToLocalTime().ToLongTimeString(),
                 msg.ReqSeq,
                 msg.ReqProcCount,
-                (int)((now - msg.Timestamp).TotalMilliseconds));
+                (int)((now - msg.OrigReqTimestampUtc).TotalMilliseconds));
 
             var genComsCmd = new GenComsCmd
             {
                 ComsType = ComsType.SMS,
                 CustomerId= msg.CustomerId,
                 RequestId = msg.RequestId,
-                Timestamp = msg.Timestamp,
+                OrigReqTimestampUtc = msg.OrigReqTimestampUtc,
 
                 ReqSeq = msg.ReqSeq,
                 ReqProcCount = msg.ReqProcCount + 1

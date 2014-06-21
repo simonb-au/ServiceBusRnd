@@ -44,7 +44,7 @@ namespace MultiComs2.DocRepo
                     comsGenEvent.CustomerId,
                     comsGenEvent.ComsType,
                     comsGenEvent.DocId,
-                    (int)((now - comsGenEvent.Timestamp).TotalMilliseconds));
+                    (int)((now - comsGenEvent.OrigReqTimestampUtc).TotalMilliseconds));
             }
         }
     }

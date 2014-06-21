@@ -60,7 +60,7 @@ namespace MultiComs2.Client
                 ReqSeq = _eventCounter,
                 ReqProcCount = 0,
                 RequestId = Guid.NewGuid(),
-                Timestamp = DateTime.UtcNow,
+                OrigReqTimestampUtc = DateTime.UtcNow,
                 BusEventType = (BusEventType)_rnd.Next(_eventTypeCount),
                 CustomerId = _rnd.Next(10) > 5 ? "123" : "456"
             };

@@ -2,17 +2,21 @@
 using System.Linq;
 using System.Threading;
 using System.IO;
-
+using log4net;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 
+[assembly: log4net.Config.XmlConfigurator(Watch = true)]
 
 namespace MultiComs2.Common
 {
     public abstract class Thready
     {
-        public Thready(string title)
+        private readonly ILog _log;
+
+        protected Thready(string title)
         {
+            _log = LogManager.GetLogger(GetType());
             _title = title;
         }
 
@@ -36,7 +40,7 @@ namespace MultiComs2.Common
                 if (arg.StartsWith("#"))
                     continue;
 
-                else if (arg.StartsWith("@"))
+                if (arg.StartsWith("@"))
                     ParseArgs(File.ReadAllLines(arg.Substring(1)));
 
                 else if (arg.Equals("Reset", StringComparison.OrdinalIgnoreCase))
@@ -56,7 +60,34 @@ namespace MultiComs2.Common
             }
         }
 
-        protected void Run(string[] args)
+        public void Run(string[] args)
+        {
+            StartUp(args);
+
+            RunThread();
+
+            Console.ReadLine();
+            JoinThread();
+
+            CleanUp();
+        }
+
+        private Thread _mainThread;
+
+        public void JoinThread()
+        {
+            _running = false;
+            _mainThread.Join();
+        }
+
+        public void RunThread()
+        {
+            _running = true;
+            _mainThread = new Thread(ThreadMain);
+            _mainThread.Start();
+        }
+
+        public void StartUp(string[] args)
         {
             Console.Title = _title;
 
@@ -71,17 +102,6 @@ namespace MultiComs2.Common
                 return;
 
             Console.WriteLine("Running {0} ...", _title);
-
-            _running = true;
-            var t = new Thread(ThreadMain);
-            t.Start();
-
-            Console.ReadLine();
-            _running = false;
-
-            t.Join();
-
-            CleanUp();
         }
 
         protected virtual void ThreadMain()
@@ -139,7 +159,7 @@ namespace MultiComs2.Common
 
         protected void VerifySubs(string topicPath, string subsName, bool reset, Filter filter)
         {
-            Console.WriteLine("VerifySubs Topic - {0}, {1} (Reset = {2})", topicPath, subsName, reset);
+            _log.InfoFormat("VerifySubs Topic - {0}, {1} (Reset = {2})", topicPath, subsName, reset) ;
             
             var nsMgr = NamespaceManager.Create();
 
