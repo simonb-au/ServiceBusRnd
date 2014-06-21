@@ -28,19 +28,7 @@ namespace MultiComs2.SmsFulfilment
 
         protected override void Init(string[] args)
         {
-            var nsMgr = NamespaceManager.Create();
-
-            var exists = nsMgr.SubscriptionExists(Constants.ComsGendEvent, Constants.ComsSmsFulfilmentSubs);
-
-            if (Reset && exists)
-            {
-                nsMgr.DeleteSubscription(Constants.ComsGendEvent, Constants.ComsSmsFulfilmentSubs);
-                exists = false;
-            }
-
-            if (!exists)
-                nsMgr.CreateSubscription(Constants.ComsGendEvent, Constants.ComsSmsFulfilmentSubs, new SqlFilter("ComsType='SMS'"));
-
+            VerifySubs(Constants.ComsGendEvent, Constants.ComsSmsFulfilmentSubs, Reset, new SqlFilter("ComsType='SMS'"));
             _sc = SubscriptionClient.Create(Constants.ComsGendEvent, Constants.ComsSmsFulfilmentSubs);
         }
 

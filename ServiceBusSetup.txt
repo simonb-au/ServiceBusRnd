@@ -1,0 +1,15 @@
+Name: ServiceBusDefaultNamespace
+AddressingScheme: Path
+CreatedTime: 20/06/2014 6:39:50 AM
+IssuerName: ServiceBusDefaultNamespace
+IssuerUri: ServiceBusDefaultNamespace
+ManageUsers: simonb
+DnsEntry: 
+PrimarySymmetricKey: HPyQ3gYeReE6u7PzxGtON8jNhJG8Nfq6VtCG/0IdVsY=
+SecondarySymmetricKey: 
+
+
+Processing completed
+Endpoint=sb://simonb-dev/ServiceBusDefaultNamespace;StsEndpoint=https://simonb-dev:9355/ServiceBusDefaultNamespace;RuntimePort=9354;ManagementPort=9355
+
+Processing completed
