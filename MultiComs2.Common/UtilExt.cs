@@ -12,11 +12,11 @@ namespace MultiComs2.Common
 
             return new T
             {
-                ReqSeq = reqSeq,
+                OrigRequestSeq = reqSeq,
                 ReqProcCount = 0,
-                RequestId = reqId,
-                ReqTimestampUtc = timestampUtc,
-                OrigReqId = reqId,
+                MessageId = reqId,
+                MessageTimestampUtc = timestampUtc,
+                OrigRequestId = reqId,
                 OrigReqTimestampUtc = timestampUtc
             };
         }
@@ -26,12 +26,12 @@ namespace MultiComs2.Common
         {
             return new T
             {
-                ReqSeq = orig.ReqSeq,
-                ReqProcCount = orig.ReqProcCount + 1,
-                RequestId = Guid.NewGuid(),
-                ReqTimestampUtc = DateTime.UtcNow,
-                OrigReqId = orig.OrigReqId,
+                OrigRequestId = orig.OrigRequestId,
                 OrigReqTimestampUtc = orig.OrigReqTimestampUtc,
+                OrigRequestSeq = orig.OrigRequestSeq,
+                ReqProcCount = orig.ReqProcCount + 1,
+                MessageId = Guid.NewGuid(),
+                MessageTimestampUtc = DateTime.UtcNow,
             };
         }
     }

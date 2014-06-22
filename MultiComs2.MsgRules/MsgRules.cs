@@ -17,27 +17,38 @@ namespace MultiComs2.MsgRules
             p.Run(args);
         }
 
-        public Program()
+        private Program()
             : base("MultiComs2 - MsgRules")
         {
         }
 
-        private static IDictionary<string, ComsType> LoadCustPrefs()
+        private static IDictionary<string, IDictionary<BusEventType, ComsType>> LoadCustPrefs()
         {
-            var custPrefs = new Dictionary<string, ComsType>();
+            var custPrefs = new Dictionary<string, IDictionary<BusEventType, ComsType>>();
             using (var f = File.OpenText("CustPrefs.csv"))
             {
                 string line;
                 while ((line = f.ReadLine()) != null)
                 {
                     var vals = line.Split(',');
-                    custPrefs.Add(vals[0], (ComsType)Enum.Parse(typeof(ComsType), vals[1]));
+
+                    var custPrefList = new Dictionary<BusEventType, ComsType>();
+
+                    for (var idx = 1; idx < vals.Length; idx += 2)
+                    {
+                        custPrefList.Add(
+                            (BusEventType)Enum.Parse(typeof(BusEventType), vals[idx]),
+                            (ComsType)Enum.Parse(typeof(ComsType), vals[idx+1]));
+                    }
+
+
+                    custPrefs.Add(vals[0], custPrefList);
                 }
             }
 
             return custPrefs;
         }
-        private IDictionary<string, ComsType> _custPrefs;
+        private IDictionary<string, IDictionary<BusEventType, ComsType>> _custPrefs;
 
         private SubscriptionClient _subsClient;
         private QueueClient _comsCmdQueue;
@@ -47,7 +58,7 @@ namespace MultiComs2.MsgRules
         protected override void Init(string[] args)
         {
             _custPrefs = LoadCustPrefs();
-            Thread.Sleep(1000); // Startup Time...
+            Thread.Sleep(1000); // Start-up Time...
 
             VerifySubs(Constants.BusEvent, Constants.BusSubs, Reset);
             VerifyQueue(Constants.ComsGenCmd, Reset);
@@ -68,25 +79,33 @@ namespace MultiComs2.MsgRules
             if (brokerMsg == null)
                 return;
 
-            var now = DateTime.UtcNow;
+            var nowUtc = DateTime.UtcNow;
 
             var msg = brokerMsg.GetBody<BusEvent>();
 
             brokerMsg.Complete();
 
-            Console.WriteLine("Received: {0} {1} ({2}, Proc {3}, took {4})",
+
+            Console.WriteLine("Received: {0} {1} ({2}, Proc {3}, took {4}, {5})",
                 msg.BusEventType,
                 msg.OrigReqTimestampUtc.ToLocalTime().ToLongTimeString(),
-                msg.ReqSeq,
+                msg.OrigRequestSeq,
                 msg.ReqProcCount,
-                (int)((now - msg.OrigReqTimestampUtc).TotalMilliseconds));
+                (int)((nowUtc - msg.OrigReqTimestampUtc).TotalMilliseconds),
+                (int)((nowUtc - msg.MessageTimestampUtc).TotalMilliseconds));
 
             var genComsCmd = msg.CreateComsMsg<GenComsCmd>();
 
             genComsCmd.CustomerId = msg.CustomerId;
+            genComsCmd.BusEventType = msg.BusEventType;
 
-            if (!_custPrefs.TryGetValue(msg.CustomerId, out genComsCmd.ComsType))
+            // Calc coms pref
+            IDictionary<BusEventType, ComsType> custPrefs;
+            if ((!_custPrefs.TryGetValue(msg.CustomerId, out custPrefs)) ||
+                (!custPrefs.TryGetValue(msg.BusEventType, out genComsCmd.ComsType)))
+            {
                 genComsCmd.ComsType = ComsType.Email;
+            }
 
             _comsCmdQueue.Send(new BrokeredMessage(genComsCmd));
         }

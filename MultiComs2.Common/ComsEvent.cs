@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace MultiComs2.Common
 {
-    public enum BusEventType
+    public class ComsEvent : ComsMsg
     {
-        Payment,
-        ClaimApproved,
-        ClaimRejected,
-        ClaimPaid
-    };
+        public Guid ComsId;
+        public string CustomerId;
+    }
 }

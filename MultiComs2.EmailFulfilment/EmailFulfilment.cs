@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading;
-using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 
 using MultiComs2.Common;
@@ -16,7 +15,7 @@ namespace MultiComs2.EmailFulfilment
             program.Run(args);
         }
 
-        public Program()
+        private Program()
             : base("MultiComs2.EmailFulfilment")
         {
             _rnd = new Random();
@@ -46,28 +45,23 @@ namespace MultiComs2.EmailFulfilment
                 try
                 {
                     var comsGenEvent = msg.GetBody<ComsGeneratedEvent>();
-                    var now = DateTime.UtcNow;
+                    var nowUtc = DateTime.UtcNow;
                     msg.Complete();
 
-                    Console.WriteLine("Sending Email To Customer {0} (took {1}ms) {2}",
+                    Console.WriteLine("Sending Email To Customer {0} {1} (took {2}, {3})",
                         comsGenEvent.CustomerId,
-                        (int)((now - comsGenEvent.OrigReqTimestampUtc).TotalMilliseconds),
-                        comsGenEvent.ComsType);
+                        comsGenEvent.ComsType,
+                        (int)((nowUtc - comsGenEvent.OrigReqTimestampUtc).TotalMilliseconds),
+                        (int)((nowUtc - comsGenEvent.MessageTimestampUtc).TotalMilliseconds));
 
                     Thread.Sleep(_rnd.Next(100, 2000));
 
-                    var comsFilfilledEvent = new ComsFulfilledEvent
-                    {
-                        RequestId = comsGenEvent.RequestId,
-                        ComsType = comsGenEvent.ComsType,
-                        CustomerId = comsGenEvent.CustomerId,
-                        FulfilledTimestampUtc = DateTime.UtcNow,
-                        ReqProcCount = comsGenEvent.ReqProcCount + 1,
-                        ReqSeq = comsGenEvent.ReqSeq,
-                        OrigReqTimestampUtc = comsGenEvent.OrigReqTimestampUtc
-                    };
+                    var comsFilfilledEvent = comsGenEvent.CreateComsMsg<ComsFulfilledEvent>();
+                    comsFilfilledEvent.ComsId = comsGenEvent.ComsId;
+                    comsFilfilledEvent.CustomerId = comsGenEvent.CustomerId;
+                    comsFilfilledEvent.Success = (_rnd.Next(100) > 5);
 
-                    Console.WriteLine("   ... fulfilled msg");
+                    Console.WriteLine("   ... fulfilled msg->{0}", comsFilfilledEvent.Success);
 
                     var eventMsg = new BrokeredMessage(comsFilfilledEvent);
                     _tc.Send(eventMsg);

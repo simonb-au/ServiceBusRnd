@@ -46,39 +46,40 @@ namespace MultiComs2.ComsGen
             if (brokerMsg == null)
                 return;
 
-            var now = DateTime.UtcNow;
-
-            var msg = brokerMsg.GetBody<GenComsCmd>();
-
+            var cmd = brokerMsg.GetBody<GenComsCmd>();
             brokerMsg.Complete();
 
-            Console.WriteLine("Received: {0} (took {1})",
-                msg.ComsType,
-                (int)((now - msg.OrigReqTimestampUtc).TotalMilliseconds));
+            var nowUtc = DateTime.UtcNow;
 
-            var body = GenerateComs(msg.ComsType, msg.CustomerId);
+            Console.WriteLine("Received: {0} (took {1}, {2})",
+                cmd.ComsType,
+                (int)((nowUtc - cmd.OrigReqTimestampUtc).TotalMilliseconds),
+                (int)((nowUtc - cmd.MessageTimestampUtc).TotalMilliseconds));
 
-            var comsGenEvent = msg.CreateComsMsg<ComsGeneratedEvent>();
+            var body = GenerateComs(cmd.ComsType, cmd);
 
-            comsGenEvent.CustomerId = msg.CustomerId;
-            comsGenEvent.ComsType = msg.ComsType;
+            var comsGenEvent = cmd.CreateComsMsg<ComsGeneratedEvent>();
+
+            comsGenEvent.ComsId = Guid.NewGuid();
+            comsGenEvent.CustomerId = cmd.CustomerId;
+            comsGenEvent.ComsType = cmd.ComsType;
             comsGenEvent.Body = body;
             comsGenEvent.DocId = Guid.NewGuid();
 
             var eventMsg = new BrokeredMessage(comsGenEvent);
-            eventMsg.Properties["ComsType"] = msg.ComsType.ToString();
+            eventMsg.Properties["ComsType"] = cmd.ComsType.ToString();
 
             _eventTopicClient.Send(eventMsg);
         }
 
-        private string GenerateComs(ComsType comsType, string custId)
+        private string GenerateComs(ComsType comsType, GenComsCmd cmd)
         {
             switch(comsType)
             {
                 case ComsType.SMS:
-                    return string.Format("SMS for {0}", custId);
+                    return string.Format("SMS for {0} {1}", cmd.CustomerId, cmd.BusEventType);
                 case ComsType.Email:
-                    return string.Format("CustomerId {0} - Email", custId);
+                    return string.Format("CustomerId {0} {1} - Email", cmd.CustomerId, cmd.BusEventType);
                 default:
                     throw new ApplicationException("Error - Unknown ComsType");
             }

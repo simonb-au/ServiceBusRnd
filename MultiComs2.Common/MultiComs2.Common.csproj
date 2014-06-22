@@ -47,9 +47,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BusEvent.cs" />
+    <Compile Include="ComsEvent.cs" />
     <Compile Include="ComsFulfilledEvent.cs" />
     <Compile Include="ComsGeneratedEvent.cs" />
-    <Compile Include="ComsEventType.cs" />
+    <Compile Include="BusEventType.cs" />
     <Compile Include="ComsMsg.cs" />
     <Compile Include="ComsType.cs" />
     <Compile Include="Constants.cs" />

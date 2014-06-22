@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace MultiComs2.Common
 {
-    public class ComsFulfilledEvent :  ComsEvent
+    public enum BusEventType
     {
-        public bool Success;
-    }
+        BookingCreated,
+        BookingUpdate,
+        DeliveryStarted,
+        LegCompleted
+    };
 }

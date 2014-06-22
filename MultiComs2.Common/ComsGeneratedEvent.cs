@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace MultiComs2.Common
 {
-    public class ComsGeneratedEvent : ComsMsg
+    public class ComsGeneratedEvent : ComsEvent
     {
         public string Body;
         public ComsType ComsType;
-        public string CustomerId;
         public Guid DocId;
     }
 }

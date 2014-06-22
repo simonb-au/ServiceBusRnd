@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using log4net;
 
@@ -12,28 +12,38 @@ namespace MultiComs2.Crm
             var log = LogManager.GetLogger(typeof (Program));
             log.Info("Starting CRM...");
 
-            var crmDb = new Dictionary<Guid, ContactRecord>();
+            var crmDb = new ConcurrentDictionary<Guid, ContactRecord>();
 
             var crmReqListener = new CrmRequestListener(crmDb);
             crmReqListener.StartUp(args);
-            crmReqListener.RunThread();
 
             var crmFulfilmentListener = new CrmFulfilmentListener(crmDb);
             crmFulfilmentListener.StartUp(args);
+            
+            crmReqListener.RunThread();
             crmFulfilmentListener.RunThread();
 
-            Console.ReadLine();
+            while (string.IsNullOrEmpty(Console.ReadLine()))
+            {
+                Console.WriteLine();
+                Console.WriteLine("---------------->");
+
+                foreach (var cr in crmDb.Values
+                    .OrderBy(x => x.CustomerId)
+                    .ThenBy(x => x.RequestedUtc))
+                {
+                    Console.WriteLine("{0} - {1}, {2} ({3}ms)", 
+                        cr.CustomerId, 
+                        cr.ContactId, 
+                        cr.ContactStatus,
+                        (cr.ContactStatus == ContactStatus.Requested ? TimeSpan.FromMilliseconds(0) : (cr.FulfilledUtc - cr.RequestedUtc)));
+                }
+                Console.WriteLine("<----------------");
+                Console.WriteLine();
+            } 
 
             crmFulfilmentListener.JoinThread();
             crmReqListener.JoinThread();
-
-
-            foreach (var cr in crmDb.Values.OrderBy(x => x.CustomerId))
-            {
-                Console.WriteLine("{0} - {1}, {2}", cr.CustomerId, cr.ContactId, cr.ContactStatus);
-            }
-
-            Console.ReadLine();
         }
     }
 }

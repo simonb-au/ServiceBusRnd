@@ -8,6 +8,7 @@ namespace MultiComs2.Common
 {
     public class GenComsCmd : ComsMsg
     {
+        public BusEventType BusEventType;
         public ComsType ComsType;
         public string CustomerId;
     }

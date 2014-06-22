@@ -60,18 +60,12 @@ namespace MultiComs2.SmsFulfilment
 
                     Thread.Sleep(_rnd.Next(100, 2000));
 
-                    var comsFilfilledEvent = new ComsFulfilledEvent
-                    {
-                        RequestId = comsGenEvent.RequestId,
-                        ComsType = comsGenEvent.ComsType,
-                        CustomerId = comsGenEvent.CustomerId,
-                        FulfilledTimestampUtc = DateTime.UtcNow,
-                        ReqProcCount = comsGenEvent.ReqProcCount + 1,
-                        ReqSeq = comsGenEvent.ReqSeq,
-                        OrigReqTimestampUtc = comsGenEvent.OrigReqTimestampUtc
-                    };
+                    var comsFilfilledEvent = comsGenEvent.CreateComsMsg<ComsFulfilledEvent>();
+                    comsFilfilledEvent.ComsId = comsGenEvent.ComsId;
+                    comsFilfilledEvent.CustomerId = comsGenEvent.CustomerId;
+                    comsFilfilledEvent.Success = (_rnd.Next(100) > 10);
 
-                    Console.WriteLine("   ... fulfilled msg");
+                    Console.WriteLine("   ... fulfilled msg->{0}", comsFilfilledEvent.Success);
 
                     var eventMsg = new BrokeredMessage(comsFilfilledEvent);
                     _tc.Send(eventMsg);

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading;
 using System.IO;
 using log4net;
@@ -31,9 +31,9 @@ namespace MultiComs2.Common
         protected virtual void ThreadInit() { }
         protected virtual void ThreadCleanUp() { }
 
-        protected abstract void ThreadLoop();
+        protected virtual void ThreadLoop() {  throw new NotImplementedException(); }
 
-        public void ParseArgs(string[] args)
+        protected void ParseArgs(IEnumerable<string> args)
         {
             foreach(var arg in args)
             {
@@ -60,7 +60,7 @@ namespace MultiComs2.Common
             }
         }
 
-        public void Run(string[] args)
+        protected virtual void Run(string[] args)
         {
             StartUp(args);
 
@@ -104,7 +104,7 @@ namespace MultiComs2.Common
             Console.WriteLine("Running {0} ...", _title);
         }
 
-        protected virtual void ThreadMain()
+        private void ThreadMain()
         {
             ThreadInit();
 
@@ -114,7 +114,7 @@ namespace MultiComs2.Common
             ThreadCleanUp();
         }
 
-        protected void VerifyQueue(string queueName, bool reset)
+        protected static void VerifyQueue(string queueName, bool reset)
         {
             Console.WriteLine("VerifyQueue Topic - {0} (Reset = {1})", queueName, reset);
 
@@ -132,7 +132,7 @@ namespace MultiComs2.Common
                 nsMgr.CreateQueue(queueName);
         }
 
-        protected void VerifyTopic(string topicName, bool reset)
+        protected static void VerifyTopic(string topicName, bool reset)
         {
             Console.WriteLine("Verifying Topic - {0} (Reset = {1})", topicName, reset);
 
@@ -171,13 +171,13 @@ namespace MultiComs2.Common
                 subsExists = false;
             }
 
-            if (!subsExists)
-            {
-                if (filter != null)
-                    nsMgr.CreateSubscription(topicPath, subsName, filter);
-                else
-                    nsMgr.CreateSubscription(topicPath, subsName);
-            }
+            if (subsExists) 
+                return;
+            
+            if (filter != null)
+                nsMgr.CreateSubscription(topicPath, subsName, filter);
+            else
+                nsMgr.CreateSubscription(topicPath, subsName);
         }
     }
 }

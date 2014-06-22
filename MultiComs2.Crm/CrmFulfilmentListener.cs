@@ -30,29 +30,30 @@ namespace MultiComs2.Crm
             if (msg == null) 
                 return;
             
-            var comsGenEvent = msg.GetBody<ComsFulfilledEvent>();
+            var comsFilfilledEvent = msg.GetBody<ComsFulfilledEvent>();
             var now = DateTime.UtcNow;
             msg.Complete();
 
-            Console.WriteLine("Storing Coms Contact Fulfilment Event for Customer {0} - {1} (took {2}ms)",
-                comsGenEvent.CustomerId,
-                comsGenEvent.ComsType,
-                (int) ((now - comsGenEvent.OrigReqTimestampUtc).TotalMilliseconds));
+            Console.WriteLine("Storing Coms Contact Fulfilment Event for Customer {0} {1} - (took {2}, {3})",
+                comsFilfilledEvent.ComsId,
+                comsFilfilledEvent.Success,
+                (int) ((now - comsFilfilledEvent.OrigReqTimestampUtc).TotalMilliseconds),
+                (int)((now - comsFilfilledEvent.MessageTimestampUtc).TotalMilliseconds));
 
 
             ContactRecord contact;
-            if (!_crmDb.TryGetValue(comsGenEvent.RequestId, out contact))
+            if (!_crmDb.TryGetValue(comsFilfilledEvent.ComsId, out contact))
             {
                 contact = new ContactRecord
                 {
-                    ContactId = comsGenEvent.RequestId
+                    ContactId = comsFilfilledEvent.MessageId
                 };
             }
 
-            contact.ContactStatus = ContactStatus.ContactFulfilledSuccessfully;
-            contact.FulfilledUtc = comsGenEvent.FulfilledTimestampUtc;
+            contact.FulfilledUtc = comsFilfilledEvent.MessageTimestampUtc;
+            contact.ContactStatus = comsFilfilledEvent.Success ? ContactStatus.ContactFulfilledSuccessfully : ContactStatus.ContactFulfilledFailed;
 
-            _crmDb[comsGenEvent.RequestId] = contact;
+            _crmDb[comsFilfilledEvent.ComsId] = contact;
         }
     }
 }

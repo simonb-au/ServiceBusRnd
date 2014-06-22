@@ -1,2 +1,2 @@
-﻿123,SMS
-456,Email
+﻿123,BookingCreated,Email,BookingUpdate,SMS,DeliveryStarted,SMS,LegCompleted,SMS
+456,BookingUpdate,SMS,LegCompleted,SMS

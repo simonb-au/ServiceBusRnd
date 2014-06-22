@@ -8,11 +8,11 @@ namespace MultiComs2.Common
 {
     public class ComsMsg
     {
-        public int ReqSeq { get; set; }
-        public int ReqProcCount { get; set; }
-        public Guid RequestId { get; set; }
-        public DateTime ReqTimestampUtc { get; set; }
-        public Guid OrigReqId { get; set; }
+        public int OrigRequestSeq { get; set; }
+        public Guid OrigRequestId { get; set; }
         public DateTime OrigReqTimestampUtc { get; set; }    
+        public Guid MessageId { get; set; }
+        public DateTime MessageTimestampUtc { get; set; }
+        public int ReqProcCount { get; set; }
     }
 }
