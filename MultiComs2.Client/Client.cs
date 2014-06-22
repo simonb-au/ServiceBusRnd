@@ -55,15 +55,10 @@ namespace MultiComs2.Client
         {
             Console.WriteLine("Event {0} ...", _eventCounter++);
 
-            var msg = new BusEvent
-            {
-                ReqSeq = _eventCounter,
-                ReqProcCount = 0,
-                RequestId = Guid.NewGuid(),
-                OrigReqTimestampUtc = DateTime.UtcNow,
-                BusEventType = (BusEventType)_rnd.Next(_eventTypeCount),
-                CustomerId = _rnd.Next(10) > 5 ? "123" : "456"
-            };
+            var msg = UtilExt.CreateComsMsg<BusEvent>(_eventCounter);
+
+            msg.BusEventType = (BusEventType)_rnd.Next(_eventTypeCount);
+            msg.CustomerId = _rnd.Next(10) > 5 ? "123" : "456";
 
             var sendMessage = new BrokeredMessage(msg);
             _topicClient.Send(sendMessage);

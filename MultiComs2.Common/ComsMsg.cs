@@ -11,6 +11,8 @@ namespace MultiComs2.Common
         public int ReqSeq { get; set; }
         public int ReqProcCount { get; set; }
         public Guid RequestId { get; set; }
+        public DateTime ReqTimestampUtc { get; set; }
+        public Guid OrigReqId { get; set; }
         public DateTime OrigReqTimestampUtc { get; set; }    
     }
 }

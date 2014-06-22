@@ -22,7 +22,7 @@ namespace MultiComs2.MsgRules
         {
         }
 
-        private IDictionary<string, ComsType> LoadCustPrefs()
+        private static IDictionary<string, ComsType> LoadCustPrefs()
         {
             var custPrefs = new Dictionary<string, ComsType>();
             using (var f = File.OpenText("CustPrefs.csv"))
@@ -81,17 +81,9 @@ namespace MultiComs2.MsgRules
                 msg.ReqProcCount,
                 (int)((now - msg.OrigReqTimestampUtc).TotalMilliseconds));
 
-            var genComsCmd = new GenComsCmd
-            {
-                ComsType = ComsType.SMS,
-                CustomerId= msg.CustomerId,
-                RequestId = msg.RequestId,
-                OrigReqTimestampUtc = msg.OrigReqTimestampUtc,
+            var genComsCmd = msg.CreateComsMsg<GenComsCmd>();
 
-                ReqSeq = msg.ReqSeq,
-                ReqProcCount = msg.ReqProcCount + 1
-
-            };
+            genComsCmd.CustomerId = msg.CustomerId;
 
             if (!_custPrefs.TryGetValue(msg.CustomerId, out genComsCmd.ComsType))
                 genComsCmd.ComsType = ComsType.Email;

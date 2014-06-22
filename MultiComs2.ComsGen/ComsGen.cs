@@ -58,15 +58,12 @@ namespace MultiComs2.ComsGen
 
             var body = GenerateComs(msg.ComsType, msg.CustomerId);
 
-            var comsGenEvent = new ComsGeneratedEvent
-            {
-                CustomerId = msg.CustomerId,
-                ComsType = msg.ComsType,
-                RequestId = msg.RequestId,
-                OrigReqTimestampUtc = msg.OrigReqTimestampUtc,
-                Body = body,
-                DocId = Guid.NewGuid()
-            };
+            var comsGenEvent = msg.CreateComsMsg<ComsGeneratedEvent>();
+
+            comsGenEvent.CustomerId = msg.CustomerId;
+            comsGenEvent.ComsType = msg.ComsType;
+            comsGenEvent.Body = body;
+            comsGenEvent.DocId = Guid.NewGuid();
 
             var eventMsg = new BrokeredMessage(comsGenEvent);
             eventMsg.Properties["ComsType"] = msg.ComsType.ToString();
