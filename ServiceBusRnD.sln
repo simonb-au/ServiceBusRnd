@@ -22,6 +22,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5F586F9D-446C-4A6F-9EBF-D9E10015489D}"
 	ProjectSection(SolutionItems) = preProject
 		Args.txt = Args.txt
+		CommonVersion.cs = CommonVersion.cs
 		README.md = README.md
 		ServiceBus.config = ServiceBus.config
 		ServiceBusSetup.txt = ServiceBusSetup.txt
