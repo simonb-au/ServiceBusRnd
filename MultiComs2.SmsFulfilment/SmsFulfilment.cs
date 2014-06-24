@@ -1,13 +1,8 @@
-﻿using System.Threading;
-using Microsoft.ServiceBus;
+﻿using System;
+using System.Threading;
+using System.IO;
 using Microsoft.ServiceBus.Messaging;
 using MultiComs2.Common;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiComs2.SmsFulfilment
 {
@@ -15,6 +10,7 @@ namespace MultiComs2.SmsFulfilment
     {
         static void Main(string[] args)
         {
+            log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
             var program = new Program();
             program.Run(args);
         }
@@ -43,37 +39,37 @@ namespace MultiComs2.SmsFulfilment
         protected override void ThreadLoop()
         {
             var msg = _sc.Receive(_waitTime);
-            if (msg != null)
+            if (msg == null)
+                return;
+            try
             {
-                try
-                {
-                    var comsGenEvent = msg.GetBody<ComsGeneratedEvent>();
-                    var now = DateTime.UtcNow;
-                    msg.Complete();
+                var comsGenEvent = msg.GetBody<ComsGeneratedEvent>();
+                var now = DateTime.UtcNow;
+                msg.Complete();
 
-                    Console.WriteLine("Sending SMS To Customer {0} (took {1}ms) {2} ({3:HH:mm:ss.fff} - {4:hh:mm:ss.fff}",
-                        comsGenEvent.CustomerId,
-                        (int)((now - comsGenEvent.OrigReqTimestampUtc).TotalMilliseconds),
-                        comsGenEvent.ComsType,
-                        now,
-                        comsGenEvent.OrigReqTimestampUtc);
+                Log.InfoFormat("Sending SMS To Customer {0} (took {1}ms) {2} ({3:HH:mm:ss.fff} - {4:hh:mm:ss.fff}",
+                    comsGenEvent.CustomerId,
+                    (int)((now - comsGenEvent.OrigReqTimestampUtc).TotalMilliseconds),
+                    comsGenEvent.ComsType,
+                    now,
+                    comsGenEvent.OrigReqTimestampUtc);
 
-                    Thread.Sleep(_rnd.Next(100, 2000));
+                Thread.Sleep(_rnd.Next(100, 2000));
 
-                    var comsFilfilledEvent = comsGenEvent.CreateComsMsg<ComsFulfilledEvent>();
-                    comsFilfilledEvent.ComsId = comsGenEvent.ComsId;
-                    comsFilfilledEvent.CustomerId = comsGenEvent.CustomerId;
-                    comsFilfilledEvent.Success = (_rnd.Next(100) > 10);
+                var comsFilfilledEvent = comsGenEvent.CreateComsMsg<ComsFulfilledEvent>();
+                comsFilfilledEvent.ComsId = comsGenEvent.ComsId;
+                comsFilfilledEvent.CustomerId = comsGenEvent.CustomerId;
+                comsFilfilledEvent.Success = (_rnd.Next(100) > 10);
 
-                    Console.WriteLine("   ... fulfilled msg->{0}", comsFilfilledEvent.Success);
+                Log.InfoFormat("   ... fulfilled msg->{0}", comsFilfilledEvent.Success);
 
-                    var eventMsg = new BrokeredMessage(comsFilfilledEvent);
-                    _tc.Send(eventMsg);
-                }
-                catch(System.Runtime.Serialization.SerializationException ex)
-                {
-                    Debug.WriteLine(ex.GetType().Name + ": " + ex.Message);
-                }
+                var eventMsg = new BrokeredMessage(comsFilfilledEvent);
+                _tc.Send(eventMsg);
+            }
+            catch(System.Runtime.Serialization.SerializationException ex)
+            {
+                Log.Error(ex.GetType().Name + ": " + ex.Message);
+                Log.Error(ex);
             }
         }
     }

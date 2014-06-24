@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Threading;
+using System.IO;
 using Microsoft.ServiceBus.Messaging;
-
 using MultiComs2.Common;
 
 namespace MultiComs2.EmailFulfilment
@@ -11,6 +10,7 @@ namespace MultiComs2.EmailFulfilment
     {
         static void Main(string[] args)
         {
+            log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
             var program = new Program();
             program.Run(args);
         }
@@ -48,7 +48,7 @@ namespace MultiComs2.EmailFulfilment
                     var nowUtc = DateTime.UtcNow;
                     msg.Complete();
 
-                    Console.WriteLine("Sending Email To Customer {0} {1} (took {2}, {3})",
+                    Log.InfoFormat("Sending Email To Customer {0} {1} (took {2}, {3})",
                         comsGenEvent.CustomerId,
                         comsGenEvent.ComsType,
                         (int)((nowUtc - comsGenEvent.OrigReqTimestampUtc).TotalMilliseconds),
@@ -61,14 +61,15 @@ namespace MultiComs2.EmailFulfilment
                     comsFilfilledEvent.CustomerId = comsGenEvent.CustomerId;
                     comsFilfilledEvent.Success = (_rnd.Next(100) > 5);
 
-                    Console.WriteLine("   ... fulfilled msg->{0}", comsFilfilledEvent.Success);
+                    Log.InfoFormat("   ... fulfilled msg->{0}", comsFilfilledEvent.Success);
 
                     var eventMsg = new BrokeredMessage(comsFilfilledEvent);
                     _tc.Send(eventMsg);
                 }
                 catch (System.Runtime.Serialization.SerializationException ex)
                 {
-                    Debug.WriteLine(ex.GetType().Name + ": " + ex.Message);
+                    Log.Error(ex.GetType().Name + ": " + ex.Message);
+                    Log.Error(ex);
                 }
             }
         }

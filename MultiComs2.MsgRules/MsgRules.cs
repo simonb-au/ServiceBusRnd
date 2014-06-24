@@ -13,6 +13,7 @@ namespace MultiComs2.MsgRules
     {
         static void Main(string[] args)
         {
+            log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
             var p = new Program();
             p.Run(args);
         }
@@ -79,14 +80,12 @@ namespace MultiComs2.MsgRules
             if (brokerMsg == null)
                 return;
 
-            var nowUtc = DateTime.UtcNow;
-
             var msg = brokerMsg.GetBody<BusEvent>();
-
             brokerMsg.Complete();
 
+            var nowUtc = DateTime.UtcNow;
 
-            Console.WriteLine("Received: {0} {1} ({2}, Proc {3}, took {4}, {5})",
+            Log.InfoFormat("Received: {0} {1} ({2}, Proc {3}, took {4}, {5})",
                 msg.BusEventType,
                 msg.OrigReqTimestampUtc.ToLocalTime().ToLongTimeString(),
                 msg.OrigRequestSeq,

@@ -7,6 +7,7 @@ using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 
 using MultiComs2.Common;
+using System.IO;
 
 namespace MultiComs2.Client
 {
@@ -14,6 +15,7 @@ namespace MultiComs2.Client
     {
         static void Main(string[] args)
         {
+            log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
             var p = new Program();
             p.Run(args);
         }
@@ -31,7 +33,7 @@ namespace MultiComs2.Client
 
         protected override void Init(string[] args)
         {
-            Console.WriteLine("Starting.");
+            Log.Info("Starting...");
             VerifyTopic(Constants.BusEvent, Reset);
 
             if (args.Contains("pause", StringComparer.OrdinalIgnoreCase))
@@ -48,12 +50,12 @@ namespace MultiComs2.Client
         protected override void CleanUp()
         {
             _topicClient.Close();
-            Console.WriteLine("Done.");
+            Log.Info("Done.");
         }
 
         protected override void ThreadLoop()
         {
-            Console.WriteLine("Event {0} ...", _eventCounter++);
+            Log.InfoFormat("Event {0} ...", _eventCounter++);
 
             var msg = UtilExt.CreateComsMsg<BusEvent>(_eventCounter);
 

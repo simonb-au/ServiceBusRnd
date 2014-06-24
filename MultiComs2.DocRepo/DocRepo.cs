@@ -1,11 +1,7 @@
-﻿using Microsoft.ServiceBus;
+﻿using System;
+using System.IO;
 using Microsoft.ServiceBus.Messaging;
 using MultiComs2.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiComs2.DocRepo
 {
@@ -13,6 +9,8 @@ namespace MultiComs2.DocRepo
     {
         static void Main(string[] args)
         {
+            log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
+            
             var program = new Program();
             program.Run(args);
         }
@@ -40,7 +38,7 @@ namespace MultiComs2.DocRepo
                 var now = DateTime.UtcNow;
                 msg.Complete();
 
-                Console.WriteLine("Saving Coms Document for Customer {0} - {1}, {2} (took {3}, {4}) {5}",
+                Log.InfoFormat("Saving Coms Document for Customer {0} - {1}, {2} (took {3}, {4}) {5}",
                     comsGenEvent.CustomerId,
                     comsGenEvent.ComsType,
                     comsGenEvent.DocId,

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.IO;
 using System.Linq;
+
 using log4net;
 
 namespace MultiComs2.Crm
@@ -9,7 +11,9 @@ namespace MultiComs2.Crm
     {
         private static void Main(string[] args)
         {
-            var log = LogManager.GetLogger(typeof (Program));
+            log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
+
+            var log = LogManager.GetLogger(typeof(Program));
             log.Info("Starting CRM...");
 
             var crmDb = new ConcurrentDictionary<Guid, ContactRecord>();

@@ -34,7 +34,7 @@ namespace MultiComs2.Crm
             var now = DateTime.UtcNow;
             msg.Complete();
 
-            Console.WriteLine("Storing Coms Contact Request Event for Customer {0} - {1} {2} (took {3}, {4})",
+            Log.InfoFormat("Storing Coms Contact Request Event for Customer {0} - {1} {2} (took {3}, {4})",
                 comsGenEvent.ComsId,
                 comsGenEvent.CustomerId,
                 comsGenEvent.ComsType,

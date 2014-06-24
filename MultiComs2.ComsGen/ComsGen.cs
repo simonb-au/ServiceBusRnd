@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Threading;
+using System.IO;
 
-using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 
 using MultiComs2.Common;
@@ -12,6 +11,7 @@ namespace MultiComs2.ComsGen
     {
         static void Main(string[] args)
         {
+            log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
             var p = new Program();
             p.Run(args);
         }
@@ -51,7 +51,7 @@ namespace MultiComs2.ComsGen
 
             var nowUtc = DateTime.UtcNow;
 
-            Console.WriteLine("Received: {0} (took {1}, {2})",
+            Log.InfoFormat("Received: {0} (took {1}, {2})",
                 cmd.ComsType,
                 (int)((nowUtc - cmd.OrigReqTimestampUtc).TotalMilliseconds),
                 (int)((nowUtc - cmd.MessageTimestampUtc).TotalMilliseconds));

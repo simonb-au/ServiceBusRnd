@@ -34,7 +34,7 @@ namespace MultiComs2.Crm
             var now = DateTime.UtcNow;
             msg.Complete();
 
-            Console.WriteLine("Storing Coms Contact Fulfilment Event for Customer {0} {1} - (took {2}, {3})",
+            Log.InfoFormat("Storing Coms Contact Fulfilment Event for Customer {0} {1} - (took {2}, {3})",
                 comsFilfilledEvent.ComsId,
                 comsFilfilledEvent.Success,
                 (int) ((now - comsFilfilledEvent.OrigReqTimestampUtc).TotalMilliseconds),

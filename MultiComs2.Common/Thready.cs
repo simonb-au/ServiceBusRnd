@@ -6,17 +6,15 @@ using log4net;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 
-[assembly: log4net.Config.XmlConfigurator(Watch = true)]
-
 namespace MultiComs2.Common
 {
     public abstract class Thready
     {
-        private readonly ILog _log;
+        protected ILog Log { get; private set; }
 
         protected Thready(string title)
         {
-            _log = LogManager.GetLogger(GetType());
+            Log = LogManager.GetLogger(GetType());
             _title = title;
         }
 
@@ -96,12 +94,12 @@ namespace MultiComs2.Common
             Init(args);
 
             if (Reset)
-                Console.WriteLine("Reset... done.");
+                Log.InfoFormat("Reset... done.");
 
             if (InitOnly)
                 return;
 
-            Console.WriteLine("Running {0} ...", _title);
+            Log.InfoFormat("Running {0} ...", _title);
         }
 
         private void ThreadMain()
@@ -114,9 +112,9 @@ namespace MultiComs2.Common
             ThreadCleanUp();
         }
 
-        protected static void VerifyQueue(string queueName, bool reset)
+        protected void VerifyQueue(string queueName, bool reset)
         {
-            Console.WriteLine("VerifyQueue Topic - {0} (Reset = {1})", queueName, reset);
+            Log.InfoFormat("VerifyQueue Topic - {0} (Reset = {1})", queueName, reset);
 
             var nsMgr = NamespaceManager.Create();
 
@@ -132,9 +130,9 @@ namespace MultiComs2.Common
                 nsMgr.CreateQueue(queueName);
         }
 
-        protected static void VerifyTopic(string topicName, bool reset)
+        protected void VerifyTopic(string topicName, bool reset)
         {
-            Console.WriteLine("Verifying Topic - {0} (Reset = {1})", topicName, reset);
+            Log.InfoFormat("Verifying Topic - {0} (Reset = {1})", topicName, reset);
 
             var nsMgr = NamespaceManager.Create();
 
@@ -159,7 +157,7 @@ namespace MultiComs2.Common
 
         protected void VerifySubs(string topicPath, string subsName, bool reset, Filter filter)
         {
-            _log.InfoFormat("VerifySubs Topic - {0}, {1} (Reset = {2})", topicPath, subsName, reset) ;
+            Log.InfoFormat("VerifySubs Topic - {0}, {1} (Reset = {2})", topicPath, subsName, reset) ;
             
             var nsMgr = NamespaceManager.Create();
 
