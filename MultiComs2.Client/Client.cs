@@ -26,9 +26,22 @@ namespace MultiComs2.Client
         TopicClient _topicClient;
         private int _eventCounter;
 
+        private bool _longStep = false;
+
         public Program()
             : base("MultiComs2 - Client")
         {
+        }
+
+        protected override bool ParseArg(string arg) 
+        {
+            if (arg.Equals("Step", StringComparison.OrdinalIgnoreCase))
+            {
+                _longStep = true;
+                return true;
+            }
+
+            return false;
         }
 
         protected override void Init(string[] args)
@@ -65,7 +78,7 @@ namespace MultiComs2.Client
             var sendMessage = new BrokeredMessage(msg);
             _topicClient.Send(sendMessage);
 
-            Thread.Sleep(_rnd.Next(1500));
+            Thread.Sleep(_longStep ? 5000 : _rnd.Next(1500));
         }
     }
 }

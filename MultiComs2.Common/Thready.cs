@@ -31,6 +31,8 @@ namespace MultiComs2.Common
 
         protected virtual void ThreadLoop() {  throw new NotImplementedException(); }
 
+        protected virtual bool ParseArg(string arg) { return false; }
+
         protected void ParseArgs(IEnumerable<string> args)
         {
             foreach(var arg in args)
@@ -53,8 +55,10 @@ namespace MultiComs2.Common
                     InitOnly = true;
                 }
 
-                else 
+                else if (!ParseArg(arg))
+                {
                     Console.WriteLine("Unknown Argument: {0}", arg);
+                }
             }
         }
 
