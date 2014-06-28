@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 using Microsoft.ServiceBus.Messaging;
@@ -26,7 +27,7 @@ namespace MultiComs2.ComsGen
 
         private readonly TimeSpan _serverWait = new TimeSpan(0, 0, 1);
 
-        protected override void Init(string[] args)
+        protected override void Init(IEnumerable<string> args)
         {
             VerifyTopic(Constants.ComsGendEvent, Reset);
 

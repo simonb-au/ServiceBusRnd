@@ -20,18 +20,22 @@ namespace MultiComs2.Client
             p.Run(args);
         }
 
-        private readonly Random _rnd = new Random();
+        private readonly Random _rnd;
         private readonly int _eventTypeCount = Enum.GetValues(typeof(BusEventType)).Length;
 
         TopicClient _topicClient;
         private int _eventCounter;
 
-        public Program()
+        private Func<int> _delay;
+
+        private Program()
             : base("MultiComs2 - Client")
         {
+            _rnd = new Random();
+            _delay = () => _rnd.Next(1500);
         }
 
-        protected override void Init(string[] args)
+        protected override void Init(IEnumerable<string> args)
         {
             Log.Info("Starting...");
             VerifyTopic(Constants.BusEvent, Reset);
@@ -45,6 +49,17 @@ namespace MultiComs2.Client
             _topicClient = TopicClient.Create(Constants.BusEvent);
 
             _eventCounter = 0;
+        }
+
+        protected override bool ParseArg(string arg)
+        {
+            if (arg.Equals("step", StringComparison.OrdinalIgnoreCase))
+            {
+                _delay = () => 5000;
+                return true;
+            }
+
+            return false;
         }
 
         protected override void CleanUp()
@@ -65,7 +80,7 @@ namespace MultiComs2.Client
             var sendMessage = new BrokeredMessage(msg);
             _topicClient.Send(sendMessage);
 
-            Thread.Sleep(_rnd.Next(1500));
+            Thread.Sleep(_delay());
         }
     }
 }

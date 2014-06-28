@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.IO;
 using Microsoft.ServiceBus.Messaging;
@@ -27,7 +28,7 @@ namespace MultiComs2.SmsFulfilment
         private TopicClient _tc;
         private readonly Random _rnd;
 
-        protected override void Init(string[] args)
+        protected override void Init(IEnumerable<string> args)
         {
             VerifySubs(Constants.ComsGendEvent, Constants.ComsSmsFulfilmentSubs, Reset, new SqlFilter("ComsType='SMS'"));
             _sc = SubscriptionClient.Create(Constants.ComsGendEvent, Constants.ComsSmsFulfilmentSubs);

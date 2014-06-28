@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.ServiceBus.Messaging;
 using MultiComs2.Common;
@@ -23,7 +24,7 @@ namespace MultiComs2.DocRepo
         private SubscriptionClient _sc;
         private readonly TimeSpan _waitTime = new TimeSpan(TimeSpan.TicksPerSecond);
 
-        protected override void Init(string[] args)
+        protected override void Init(IEnumerable<string> args)
         {
             VerifySubs(Constants.ComsGendEvent, Constants.ComsStoreSubs, Reset);
             _sc = SubscriptionClient.Create(Constants.ComsGendEvent, Constants.ComsStoreSubs);

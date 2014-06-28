@@ -21,17 +21,18 @@ namespace MultiComs2.Common
         private readonly string _title;
         private volatile bool _running;
 
-        public bool Reset { get; private set; }
-        public bool InitOnly { get; private set; }
+        protected bool Reset { get; set; }
+        protected bool InitOnly { get; set; }
 
-        protected virtual void Init(string[] args) { }
+        protected virtual void Init(IEnumerable<string> args) { }
         protected virtual void CleanUp() { }
         protected virtual void ThreadInit() { }
         protected virtual void ThreadCleanUp() { }
 
         protected virtual void ThreadLoop() {  throw new NotImplementedException(); }
+        protected virtual bool ParseArg(string arg) { return false; }
 
-        protected void ParseArgs(IEnumerable<string> args)
+        private void ParseArgs(IEnumerable<string> args)
         {
             foreach(var arg in args)
             {
@@ -52,8 +53,7 @@ namespace MultiComs2.Common
                     Reset = true;
                     InitOnly = true;
                 }
-
-                else 
+                else if (!ParseArg(arg))
                     Console.WriteLine("Unknown Argument: {0}", arg);
             }
         }

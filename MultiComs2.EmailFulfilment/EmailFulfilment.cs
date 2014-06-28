@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.IO;
 using Microsoft.ServiceBus.Messaging;
@@ -28,7 +29,7 @@ namespace MultiComs2.EmailFulfilment
         private readonly Random _rnd;
         
 
-        protected override void Init(string[] args)
+        protected override void Init(IEnumerable<string> args)
         {
             VerifySubs(Constants.ComsGendEvent, Constants.ComsEmailFulfilmentSubs, Reset, new SqlFilter("ComsType='Email'"));
             _sc = SubscriptionClient.Create(Constants.ComsGendEvent, Constants.ComsEmailFulfilmentSubs);
