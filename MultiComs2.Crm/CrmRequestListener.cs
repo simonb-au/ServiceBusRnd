@@ -18,7 +18,7 @@ namespace MultiComs2.Crm
             _crmDb = crmDb;
         }
 
-        protected override void Init(string[] args)
+        protected override void Init(IEnumerable<string> args)
         {
             VerifySubs(Constants.ComsGendEvent, Constants.ComsAuditSubs, Reset);
             _sc = SubscriptionClient.Create(Constants.ComsGendEvent, Constants.ComsAuditSubs);

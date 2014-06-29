@@ -56,7 +56,7 @@ namespace MultiComs2.MsgRules
 
         private readonly TimeSpan _receiveWait = new TimeSpan(0, 0, 1);
 
-        protected override void Init(string[] args)
+        protected override void Init(IEnumerable<string> args)
         {
             _custPrefs = LoadCustPrefs();
             Thread.Sleep(1000); // Start-up Time...
